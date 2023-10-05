@@ -1,0 +1,154 @@
+---
+title: 'STAT 630: Homework 1'
+author: 'Andrea Labra Orozco '
+date: 'Due: September 7th, 2023 at 11:59pm'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+1. Listen to the following episode of [Stats + Stories](https://statsandstories.net/society1/getting-better-data-on-where-we-live).
+
+    a) What is the sampling unit in the American Housing Survey?
+    The sampling unit in the American Housing Survey is housing units 
+    
+    b) What does HUD stand for?
+    HUD stands for the U.S Department of Housing and Urban Development 
+    
+    c) How does the Census Bureau try to reduce respondent burden?
+    The Census Bureau try to reduce respondent burden by using administrative 
+    data sources such as housing characteristics like year built, number of bedrooms. 
+    
+    d) Describe the sampling process in a few sentences _in your own words_.
+    The sampling process for the American Housing Survey begins with the creation
+    of a national address list compiled by the U.S. Census Bureau, which includes 
+    residential addresses from various sources. 
+    From this list, a representative sample of about 100,000 housing units 
+    is selected every two years. 
+    
+    e) What would you like to know about? Write a research question that could be answered with the American Housing Survey.
+    One question that could be answer with the American Housing Survey 
+    How does the distribution of housing costs vary across different demographic 
+    groups (e.g., income levels, age, ethnicity) in the United States? 
+    
+2. Install the `openintro` package, by uncommenting the following code. 
+
+*Reminder: you only have to do this once- like installing an app on your phone. After you run this line of code, either **comment** it out using `#`, or just delete it.*
+
+```{r}
+#install.packages("openintro")
+```
+
+After installing the R package for our book, load it, i.e., open the app!
+
+```{r}
+library(openintro) # Load the package
+```
+
+Load in the `babies` dataset. Use the help file to learn more.
+
+```{r}
+data(babies) # Load the data
+?babies # View the help file
+```
+
+View a summary of the dataset.
+```{r}
+dplyr::glimpse(babies) # Glimpse the dataset
+summary(babies) # View a summary of each column (variable)
+```
+
+    a) What does each row in the table represent, i.e., what is the observational unit?
+    Each row in the table represents the each observation, in this case is each 
+    pregnancy that was observed in this study. 
+    
+    b) How many participants were in the study?
+    There was 1236 participants in this study 
+    
+    c) All variables are coded as integers. Which variables should be recoded as *factors*? Recode these variables in the code chunk below.
+    
+    
+```{r}
+babies$parity_f <- factor(babies$parity,
+                          labels = c("First Pregnancy", "More than 1 Pregnancy"))
+
+babies$smoke_f <- factor(babies$smoke, 
+                         label = c("Mother does not smoke", "Mother does smoke"))
+
+
+
+```
+
+    d) Create a plot to visualize one variable of your choice using `base R` functions. in the code chunk below. Make sure to add a title and relabel the x and y axes.
+    
+```{r}
+hist(babies$age,
+        main = "Age of the Mothers ", 
+        xlab = "Age", 
+        ylab = "frequency",
+        col = "pink", 
+        border = "purple"
+     )
+
+```
+
+    e) Create a plot to visualize the same variable from part (d) using `tidyverse` functions. in the code chunk below. Make sure to add a title and relabel the x and y axes.
+    
+```{r}
+#For next homework
+
+```
+
+    f) What did you learn from the plots above that you did not learn from the `summary()`? Explain.
+    
+    The histogram plot shows the distribution of mothers' ages, revealing that the data appears to be somewhat right-skewed, with more mothers falling in the younger age categories.
+    
+    g) Fill in the table below. Show the code you used in the R chunk below as well.
+    
+
+```{r}
+
+mean_motherAge <- mean(babies$age, na.rm = TRUE)
+#na.rm is to ignore N/A came from https://community.rstudio.com/t/calculate-the-mean-by-colum-when-there-is-na/152100
+sd_motherAge <- sd(babies$age, na.rm = TRUE)
+
+mean_gestation <- mean(babies$gestation, na.rm = TRUE)
+sd_gestation <- sd(babies$gestation, na.rm = TRUE)
+
+mean_bwt <- mean(babies$bwt, na.rm = TRUE)
+sd_bwt <- sd(babies$bwt, na.rm = TRUE)
+
+mean_mW <- mean(babies$weight, na.rm = TRUE)
+sd_mW <- sd(babies$weight, na.rm = TRUE)
+
+#Parity factor table 
+pari <- prop.table(table(babies$parity_f))
+pari
+
+#Smoke factor table 
+props <- prop.table(table(babies$smoke_f))
+props
+
+```
+
+    
+    
+| Variable | mean (sd) or n(/%) |
+|--------|-----------------------|
+| Mother's Age | `r round(mean_motherAge,2)`  (`r round( sd_motherAge,2)`) |
+| Parity |  |
+|-First Pregnancy| (`r round(pari[1]*100,2)`%) |
+|-More than 1 Pregnancy| (`r round(pari[2]*100,2)`%) |
+| Gestation | `r round(mean_gestation,2)`  (`r round(sd_gestation)`)|
+| Birth weight (oz) | `r round(mean_bwt,2)` (`r round(sd_bwt,2)`) |
+| Mother's weight (lbs)| `r round(mean_mW,2)` (`r round(sd_mW,2)`) |
+| Smoke status |  |
+|- Mother does not Smoke| (`r round(props[1]*100,2)`%) |
+|- Mother Smokes| (`r round(props[2]*100,2)`%) |
+
+
+    
