@@ -1,0 +1,216 @@
+---
+title: 'STAT 630: Homework 2'
+author: "Andrea Labra Orozco"
+date: 'Due: September 14th, 2023 at 11:59pm'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Exploratory Data Analysis**: The overarching goal of this homework is to explore whether there is any evidence suggestive of discrimination by sex in the employment of the faculty at a single university (University of Washington). To this end, salary data (available on Canvas) was obtained on all faculty members employed by the University during the 1995 academic year. You have been asked to provide an analysis of 1995 salaries with the primary goal of determining whether or not gender discrimination exists with respect to pay. Along with the 1995 salary the following additional variables were also collected:
+
+| Variable    | Description                                                                   |
+|-------------|-------------------------------------------------------------------------------|
+| id          | The anonymous identification number for the faculty member sex                |
+| sex         | Sex of the faculty member (coded as M or F)                                   |
+| degree      | The highest degree obtained by the faculty member (PhD, Professional, Other)  |
+| field       | Field of research during 1995 (Arts, Professional, Other)                     |
+| year_degree | Year highest degree attained                                                  |
+| start_year  | Year starting employment at the university                                    |
+| rank        | Faculty rank as of 1995 (Assistant, Associate, Full)                          |
+| admin       | Does faculty member hold an administrative position as of 1995? (0 = No, 1 = Yes) |
+| salary      | 1995 salary in US dollars                                                     |
+
+```{r, echo = FALSE, message = FALSE}
+library(tidyverse)
+salary <- read_csv(here::here("salary.csv"))
+```
+
+1. Coerce `sex`, `degree`, `field`, `rank`, and `admin` to factors.
+
+```{r}
+
+#Coerce sex 
+salary$sex_f <- factor(salary$sex,
+                          labels = c("Female", "Male"))
+
+#Coerce degree
+salary$deg_f <- factor(salary$deg,
+                          labels = c("Other", "PhD", "Professional"))
+
+#Coerce field
+salary$field_f <- factor(salary$field,
+                          labels = c("Art", "Other", "Prof"))
+
+#Coerce rank
+salary$rank_f <- factor(salary$rank,
+                          labels = c("Assistant", "Associate", "Full"))
+#Coerce admin
+salary$admin_f <- factor(salary$admin,
+                          labels = c("Does Not Hold an Administrative Position as in1995","Hold an Administrative Position as in1995" ))
+
+
+```
+
+2. Make a new column called `years_uni` and calculate the number of years the instructor has been teaching at the University (note that start year is recorded using only the last two digits of the year, e.g., 95 rather than 1995).
+
+```{r}
+#library(dplyr)
+
+df <- salary
+
+current_year <- 123
+
+salary <- df %>%
+  mutate(years_uni = current_year - start_year)
+
+
+```
+
+3. Create a table of descriptive statistics for each variable in the dataset, stratified by `sex`. Use the `kable()` function to create a publication-quality table (use the table in HW 1 as a guide!). Use the packages in the `tidyverse` (like `dplyr`) and include all of the code used.
+Make table!!
+
+
+```{r}
+# Code used to create table
+
+#For Degree 
+# Create a cross-tabulation (frequency table) using table()
+cross_tab <- table(salary$sex_f, salary$deg_f)
+# Create a proportion table using prop.table()
+degree_tab <- prop.table(cross_tab)
+print(degree_tab)
+
+#For Year of Field  
+# Create a cross-tabulation (frequency table) using table()
+cross_tab <- table(salary$sex_f, salary$field_f)
+# Create a proportion table using prop.table()
+field_tab <- prop.table(cross_tab)
+print(field_tab)
+
+#For Year of Rank   
+# Create a cross-tabulation (frequency table) using table()
+cross_tab <- table(salary$sex_f, salary$rank_f)
+# Create a proportion table using prop.table()
+rank_tab <- prop.table(cross_tab)
+print(rank_tab)
+
+#For Year of Admin   
+# Create a cross-tabulation (frequency table) using table()
+cross_tab <- table(salary$sex_f, salary$admin_f)
+# Create a proportion table using prop.table()
+admin_tab <- prop.table(cross_tab)
+print(admin_tab)
+
+# Calculate the mean & sd salary by gender
+mean_salary <- aggregate(salary$salary, by = list(salary$sex_f), FUN = mean)
+sd_salary <- aggregate(salary$salary, by = list(salary$sex_f), FUN = sd)
+# Print the result
+print(mean_salary)
+print(sd_salary)
+
+
+```
+
+| Variable |  |
+|Female |  |
+|Male |  |
+
+|--------|-----------------------|
+
+| Degree | Other | PhD | Professional |
+|Female | (`r round(degree_tab[1]*100,2)`)| (`r round(degree_tab[3]*100,2)`) | (`r round(degree_tab[5]*100,2)`) | 
+|Male | (`r round(degree_tab[2]*100,2)`)| (`r round(degree_tab[4]*100,2)`) | (`r round(degree_tab[6]*100,2)`) | 
+
+
+| Field | Art | Other | Prof |
+|Female | (`r round(field_tab[1]*100,2)`)| (`r round(field_tab[3]*100,2)`) | (`r round(field_tab[5]*100,2)`) |
+|Male |(`r round(field_tab[2]*100,2)`)| (`r round(field_tab[4]*100,2)`) | (`r round(field_tab[6]*100,2)`)  |
+
+
+| Rank | Assistant | Associate | Full |
+|Female | (`r round(rank_tab[1]*100,2)`)| (`r round(rank_tab[3]*100,2)`) | (`r round(rank_tab[5]*100,2)`) |
+|Male | (`r round(rank_tab[2]*100,2)`)| (`r round(rank_tab[4]*100,2)`) | (`r round(rank_tab[6]*100,2)`) |
+
+| Admin As in 1995  |   |
+|Female | (`r round(admin_tab[3]*100,2)`) |
+|Male | (`r round(admin_tab[4]*100,2)`)  |
+
+Not Admin 
+|Female | (`r round(admin_tab[1]*100,2)`) |
+|Male | (`r round(admin_tab[2]*100,2)`) |
+
+
+| Salary Avg | Mean (sd) |
+|Female  | `r round(mean_salary[1,2],2)` (`r round(sd_salary[1,2],2)`)  |
+|Male | `r round(mean_salary[2,2],2)` (`r round(sd_salary[2,2],2)`)  |
+
+
+4. Based on the table you created above, does there appear to be sex discrimination at the University? Explain in 2-3 sentences.
+Based on the table created above, there seem to appear to be a sex discrimination at this university. The mean between the salaries between male and female seem to vary above one-thousand. Additionally, the distribution of male full-time faculty os 45% compared to feale which is only 7.89%. 
+
+
+5. Choose what you believe to be the top two confounding variables in the relationship between sex and salary. Explain how each confounding variable is related to both sex and salary.
+A confounding variable seem to start year of each faculty member, the faculty could earn more the longer they are at the university but it could also be due to. their gender they do not have opportunity to grow as much.As well as the year of the degree they achieve the degree, could it be that the later they obtained their degree the newer they are at the university so they are not as experienced.
+
+
+6. Using `base` R, plot the relationship between sex and salary.
+
+```{r}
+
+# Calculate mean salary for each gender
+mean_salary <- tapply(df$salary, df$sex, mean)
+
+# Create a bar plot
+barplot(
+  mean_salary, 
+  names.arg = unique(df$sex),
+  xlab = "Sex", 
+  ylab = "Mean Salary",
+  col = c("lightblue", "lightgreen"),
+  border = "black",
+  main = "Mean Salary by Sex",
+  ylim = c(0, max(mean_salary) * 1.5)  # Adjust the y-axis limits
+)
+
+# Add data labels
+text(
+  x = 1:2,  # x-coordinates of labels
+  y = mean_salary + max(mean_salary) * 0.05,  # Adjust the y-coordinate for label placement
+  labels = round(mean_salary, 1),  # Round to 1 decimal places
+  pos = 4,  # Position the labels above the bars
+  cex = 1  # Adjust the label size
+)
+
+```
+
+
+7. Using `ggplot2`, plot the relationship between sex, salary, and one of your confounding variables. 
+
+```{r}
+library(ggplot2)
+
+
+# Create a scatterplot
+ggplot(df, aes(x = start_year, y = salary, color = sex)) +
+  geom_point() +  # Use points to represent data
+  labs(
+    x = "Start Year",
+    y = "Salary",
+    color = "Sex"
+  ) +
+  ggtitle("Relationship between Sex, Salary, and Start Year")
+
+
+```
+
+
+8. Comment on how the relationship between sex and salary changes for different values of your confounding variable in 1-2 sentences.
+Based on the plot above it appears that male staff at the university tend to earn more than female staff at the university. In many cases the points that represent male are still above female staff even if they starting year is the same. 
+
+
+Challenge question: Visualize the relationship between sex, salary, and [both]{.underline} of your confounding variables in a single plot.
